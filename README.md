@@ -21,6 +21,7 @@ A reference guide for KEYSTONE SAP engineers handling client migration projects 
 | [11](part2-pro/11-assessment-readiness-check.md) | Assessment & Readiness Check |
 | [12](part2-pro/12-approach-selection-framework.md) | Approach Selection Decision Framework |
 | [13](part2-pro/13-brownfield-execution.md) | Brownfield Execution Guide |
+| [13a](part2-pro/13a-dmo-technical-deep-dive.md) | DMO Technical Deep Dive |
 | [14](part2-pro/14-greenfield-execution.md) | Greenfield Execution Guide |
 | [15](part2-pro/15-shell-conversion.md) | Shell Conversion Guide |
 | [16](part2-pro/16-custom-code-remediation.md) | Custom Code Remediation |

@@ -30,6 +30,16 @@ A reference guide for KEYSTONE SAP engineers handling client migration projects 
 | [20](part2-pro/20-tools-reference.md) | Tools Reference Card |
 | [21](part2-pro/21-common-issues.md) | Common Issues & Workarounds |
 
+### Part 3: Database Reference (ECC → HANA Changes)
+| # | Topic |
+|---|-------|
+| [30](part3-database/30-database-overview.md) | Database Overview: ECC vs S/4HANA |
+| [31](part3-database/31-acdoca-universal-journal.md) | ACDOCA: Universal Journal |
+| [32](part3-database/32-matdoc-inventory.md) | MATDOC: Inventory Management Consolidation |
+| [33](part3-database/33-pool-cluster-conversion.md) | Pool/Cluster Tables → Transparent Tables |
+| [34](part3-database/34-cvi-business-partner.md) | Customer/Vendor → Business Partner (CVI) |
+| [35](part3-database/35-hana-system-views-reference.md) | SAP HANA System Views Reference |
+
 ---
 
 > **Key deadline:** SAP ECC mainstream maintenance ends **December 31, 2027**.

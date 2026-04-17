@@ -31,14 +31,14 @@ SELECT * FROM mseg INTO TABLE it_mseg
 ```abap
 DATA: it_nsdm TYPE TABLE OF nsdm_e_mseg.
 
-" NSDM_E_MSEGはS/4HANAのエンティティセット（物理テーブル）
+" NSDM_E_MSEGはMATDOC（物理テーブル）を基盤とするCDSビューエンティティ
 SELECT * FROM nsdm_e_mseg INTO TABLE @DATA(it_mseg_new)
   WHERE mblnr = '1234567890'
     AND mjahr = '2023'
   ORDER BY PRIMARY KEY.
 ```
 
-> **NSDM_E_MSEG**はMATDOCの実際の物理テーブルです。`NSDM_V_MSEG`はMATDOCの列をクラシックMSEGフィールド名にマッピングする互換ビューです。
+> **NSDM_E_MSEG**はMATDOCのデータにアクセスするCDSビューエンティティセットです。MATDOCが基礎となる物理的な透明テーブルです。NSDM_E_MSEGに直接セカンダリインデックスを作成しようとしないでください — インデックスはMATDOCに作成します。`NSDM_V_MSEG`はMATDOCの列をクラシックMSEGフィールド名にマッピングして後方互換性を提供します。
 
 **参照元：** https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-sap/sap-s-4hana-inventory-management-tables-new-simplified-data-model-nsdm/ba-p/13497469
 
@@ -57,7 +57,9 @@ SELECT * FROM mard INTO TABLE it_mard
     AND werks = '1000'.
 ```
 
-> **問題点：** MARDはS/4HANAでNSDMに置き換えられます。在庫はMARDの物理テーブルに格納されるのではなく、MATDOCから動的に計算されるようになります。
+> **問題点：** MARDはS/4HANAでNSDMに置き換えられます。在庫数量は静的なスナップショットとしてMARDの物理テーブルに格納されるのではなく、MATDOCの移動から動的に計算されるようになります。
+>
+> **重要 — 計算された在庫フィールド：** `LABST`（制限なし在庫）、`EINME`（輸送中在庫）、`INSME`（品質検査在庫）などのフィールドはオンザフライで計算されます。その影響：（1）MARD経由で直接在庫をUPDATEできません — 必ず`BAPI_GOODSMVT_CREATE`を使用してください。（2）コードがMARD在庫値を他のソース（例：インターフェースファイル）と比較している場合、比較ロジックを再調整してください — 値は保存済みスナップショットではなく計算値のため、端数処理やタイミングの差異が生じる場合があります。
 
 ### アフター（S/4HANA）— オプションA：互換ビューNSDM_V_MARDを使用
 

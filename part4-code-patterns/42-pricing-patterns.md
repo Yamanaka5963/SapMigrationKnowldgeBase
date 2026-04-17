@@ -73,12 +73,15 @@ INSERT INTO konv VALUES ls_konv.
 MODIFY konv FROM TABLE lt_konv.
 ```
 
-### After (S/4HANA) — Use cl_prc_result_factory
+### After (S/4HANA) — Advanced option: cl_prc_result_factory
+
+> **Warning — internal class:** `cl_prc_result_factory` is an internal SAP class (indicated by the `cl_prc_` namespace). SAP does not guarantee its interface stability between S/4HANA releases. **For production brownfield code, prefer V_KONV or direct PRCD_ELEMENTS reads (Patterns 1–2).** Only consider this pattern when pricing engine recalculation logic is explicitly required, and verify it is available and stable on your specific target release.
 
 ```abap
 DATA: hkomv TYPE TABLE OF komv.
 
-" Read pricing conditions using the new API
+" Read pricing conditions using internal factory class
+" CAUTION: Internal class — verify on your S/4HANA release before using in production
 cl_prc_result_factory=>get_instance(
 )->get_prc_result(
 )->get_price_element_db(
@@ -94,9 +97,9 @@ LOOP AT hkomv INTO DATA(ls_komv).
 ENDLOOP.
 ```
 
-> **When to use:** When you need pricing engine integration, write access to conditions, or when the pricing API's business logic (redetermination, scale evaluation) must be invoked.
+> **When to use:** Only when pricing engine recalculation, scale evaluation, or condition redetermination logic is needed. For simple reads, use Patterns 1 or 2.
 
-**Source:** https://community.sap.com/t5/technology-blog-posts-by-members/sap-s-4hana-advantage-prcd-elements-simplified-data-fetch/ba-p/13568684
+**Source (community post — not official SAP documentation):** https://community.sap.com/t5/technology-blog-posts-by-members/sap-s-4hana-advantage-prcd-elements-simplified-data-fetch/ba-p/13568684
 
 ---
 

@@ -145,6 +145,8 @@ DATA: lv_count TYPE i.
 
 EXEC SQL.
   SELECT COUNT(*) INTO :lv_count FROM sapsr3.mara WHERE mandt = :sy-mandt
+  " 注意：'sapsr3'はECCの典型的なスキーマプレフィックスです。
+  " S/4HANAでは'SAP<SID>'形式に変わるため、この明示的なプレフィックスはS/4HANAで動作しません。
 ENDEXEC.
 ```
 

@@ -73,12 +73,15 @@ INSERT INTO konv VALUES ls_konv.
 MODIFY konv FROM TABLE lt_konv.
 ```
 
-### アフター（S/4HANA）— cl_prc_result_factoryを使用
+### アフター（S/4HANA）— 上級オプション：cl_prc_result_factory
+
+> **警告 — 内部クラス：** `cl_prc_result_factory`は内部SAPクラスです（`cl_prc_`ネームスペースプレフィックスが内部を示します）。SAPはS/4HANAリリース間でのインターフェースの安定性を保証しません。**本番ブラウンフィールドコードでは、V_KONVまたはPRCD_ELEMENTSの直接読み取り（パターン1〜2）を推奨します。** 価格設定エンジンの再計算ロジックが明示的に必要な場合のみ、特定のターゲットリリースで利用可能かつ安定していることを確認した上で検討してください。
 
 ```abap
 DATA: hkomv TYPE TABLE OF komv.
 
-" 新しいAPIを使用して価格条件を読み取り
+" 内部ファクトリークラスを使用して価格条件を読み取り
+" 注意：内部クラス — 本番使用前にS/4HANAリリースで確認すること
 cl_prc_result_factory=>get_instance(
 )->get_prc_result(
 )->get_price_element_db(
@@ -94,9 +97,9 @@ LOOP AT hkomv INTO DATA(ls_komv).
 ENDLOOP.
 ```
 
-> **使用場面：** 価格設定エンジンの統合、条件への書き込みアクセス、または価格設定APIのビジネスロジック（再決定、スケール評価）が必要な場合。
+> **使用場面：** 価格設定エンジンの再計算、スケール評価、または条件再決定ロジックが必要な場合のみ。単純な読み取りにはパターン1または2を使用してください。
 
-**参照元：** https://community.sap.com/t5/technology-blog-posts-by-members/sap-s-4hana-advantage-prcd-elements-simplified-data-fetch/ba-p/13568684
+**参照元（コミュニティ投稿 — 公式SAP文書ではない）：** https://community.sap.com/t5/technology-blog-posts-by-members/sap-s-4hana-advantage-prcd-elements-simplified-data-fetch/ba-p/13568684
 
 ---
 

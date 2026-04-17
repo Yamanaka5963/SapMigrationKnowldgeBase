@@ -46,8 +46,10 @@ ENDIF.
 
 S/4HANAでの新規開発では、SAPがロングテキストアクセス用のCDSビューを提供しています：
 
+> **リリース注意：** `I_TextObjectPlainLongText`は**S/4HANA 1610以降**で利用可能です。1511環境では、上記の`READ_TEXT`ファンクションモジュールを使用してください — すべてのリリースで動作します。
+
 ```abap
-" CDSビュー経由でロングテキストを読み取り（S/4HANA推奨アプローチ）
+" CDSビュー経由でロングテキストを読み取り（S/4HANA推奨アプローチ、1610以降）
 SELECT * FROM i_textobjectplainlongtext
   INTO TABLE @DATA(lt_texts)
   WHERE language   = 'J'

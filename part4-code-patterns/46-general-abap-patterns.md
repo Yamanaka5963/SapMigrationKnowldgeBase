@@ -145,6 +145,8 @@ DATA: lv_count TYPE i.
 
 EXEC SQL.
   SELECT COUNT(*) INTO :lv_count FROM sapsr3.mara WHERE mandt = :sy-mandt
+  " Note: 'sapsr3' is the typical ECC schema prefix.
+  " In S/4HANA the schema name is 'SAP<SID>' — this explicit prefix breaks on S/4HANA.
 ENDEXEC.
 ```
 

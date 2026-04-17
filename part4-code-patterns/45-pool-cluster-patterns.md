@@ -46,8 +46,10 @@ ENDIF.
 
 For new development in S/4HANA, SAP provides CDS views for long text access:
 
+> **Release note:** `I_TextObjectPlainLongText` is available from **S/4HANA 1610** onwards. For systems on 1511, use the `READ_TEXT` function module (shown above) — it works in all releases.
+
 ```abap
-" Read long text via CDS view (S/4HANA preferred approach)
+" Read long text via CDS view (S/4HANA preferred approach, 1610+)
 SELECT * FROM i_textobjectplainlongtext
   INTO TABLE @DATA(lt_texts)
   WHERE language = 'E'

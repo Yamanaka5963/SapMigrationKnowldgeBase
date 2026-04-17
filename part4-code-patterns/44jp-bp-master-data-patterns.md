@@ -41,6 +41,8 @@ SELECT kna1~kunnr kna1~name1 kna1~land1 but000~bu_sort1
   ORDER BY PRIMARY KEY.
 ```
 
+> **CVIテーブルアクセスに関する注意：** `cvi_cust_link` / `cvi_vend_link`との結合は、**レポートや診断クエリ**（例：同期の完全性確認）に適しています。メンテナンス操作（得意先/仕入先マスターデータの作成・変更）では、必ずBP APIを使用してください — CVIテーブルに直接INSERTやUPDATEを行わないでください。
+
 **参照元：** https://community.sap.com/t5/application-development-and-automation-blog-posts/create-business-partner-via-api-class-cl-md-bp-maintain/ba-p/13540478
 
 ---
@@ -113,7 +115,6 @@ CALL FUNCTION 'BAPI_BUPA_CREATE_FROM_DATA'
     addressdata     = ls_bapibus1006_address
   IMPORTING
     businesspartner = lv_businesspartner
-    return          = lv_return
   TABLES
     return          = lt_return.
 

@@ -31,14 +31,14 @@ SELECT * FROM mseg INTO TABLE it_mseg
 ```abap
 DATA: it_nsdm TYPE TABLE OF nsdm_e_mseg.
 
-" NSDM_E_MSEG is the S/4HANA entity set (physical table)
+" NSDM_E_MSEG is a CDS view entity backed by MATDOC (the physical table)
 SELECT * FROM nsdm_e_mseg INTO TABLE @DATA(it_mseg_new)
   WHERE mblnr = '1234567890'
     AND mjahr = '2023'
   ORDER BY PRIMARY KEY.
 ```
 
-> **NSDM_E_MSEG** is the actual physical table in MATDOC. `NSDM_V_MSEG` is a compatibility view that maps MATDOC columns to classic MSEG field names.
+> **NSDM_E_MSEG** is a CDS view entity set that reads from MATDOC — the underlying physical transparent table. Do not try to create secondary indexes on NSDM_E_MSEG directly; index on MATDOC instead. `NSDM_V_MSEG` maps MATDOC columns back to classic MSEG field names for backward compatibility.
 
 **Source:** https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-sap/sap-s-4hana-inventory-management-tables-new-simplified-data-model-nsdm/ba-p/13497469
 
@@ -57,7 +57,9 @@ SELECT * FROM mard INTO TABLE it_mard
     AND werks = '1000'.
 ```
 
-> **Problem:** MARD is replaced by NSDM in S/4HANA. Stock is now calculated dynamically from MATDOC, not stored in a physical MARD table.
+> **Problem:** MARD is replaced by NSDM in S/4HANA. Stock quantities are now calculated dynamically from MATDOC movements, not stored as static snapshots in a physical MARD table.
+>
+> **Important — calculated stock fields:** Fields like `LABST` (unrestricted stock), `EINME` (stock in transit), `INSME` (quality inspection stock) are computed on-the-fly. Consequences: (1) You cannot UPDATE stock directly via MARD — always use `BAPI_GOODSMVT_CREATE`. (2) If your code compares MARD stock values against other sources (e.g., interface files), recalibrate the comparison logic — values are now computed, not stored snapshots, and rounding or timing differences may appear.
 
 ### After (S/4HANA) — Option A: Compatibility view NSDM_V_MARD
 

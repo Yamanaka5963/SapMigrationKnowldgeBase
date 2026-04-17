@@ -1,6 +1,6 @@
 # 41 - Financial Code Patterns (BSEG / BKPF → ACDOCA)
 
-> **Context:** In S/4HANA, the Universal Journal (ACDOCA) consolidates FI, CO, AA, and ML postings into a single table. BSEG remains as a compatibility view but direct SELECT from BSEG in custom code should be replaced. Direct INSERT/UPDATE into BSEG is forbidden.
+> **Context:** In S/4HANA, the Universal Journal (ACDOCA) consolidates FI, CO, AA, and ML postings into a single table. BSEG is declustered to a transparent table, so SELECT from BSEG works in S/4HANA — but reading from ACDOCA directly is preferred for new code. Direct INSERT/UPDATE into BSEG is forbidden.
 
 ---
 
@@ -17,6 +17,7 @@ SELECT * FROM bkpf INTO TABLE it_bkpf
   WHERE bukrs = '1000' AND gjahr = '2023'.
 
 " Step 2: Read line items — FOR ALL ENTRIES on cluster table BSEG
+" In ECC, BSEG is a cluster table and this SELECT carries cluster-read overhead
 SELECT bukrs belnr gjahr buzei wrbtr INTO TABLE it_bseg
   FROM bseg
   FOR ALL ENTRIES IN it_bkpf
@@ -25,29 +26,35 @@ SELECT bukrs belnr gjahr buzei wrbtr INTO TABLE it_bseg
     AND gjahr = it_bkpf-gjahr.
 ```
 
-> **Problem:** BSEG is a cluster table in ECC. In S/4HANA it is declustered, but SAP recommends avoiding direct SELECT and using the provided function module instead.
+> **What changed:** In S/4HANA, BSEG is **declustered** — it is now a transparent table/view. `SELECT FROM BSEG FOR ALL ENTRIES` works correctly in S/4HANA. The minimal brownfield fix is to add `IS NOT INITIAL` and `ORDER BY`. For new development, reading ACDOCA directly (Pattern 2) gives better performance.
 
-### After (S/4HANA) — Use FAGL_GET_BSEG_FOR_ALL_ENTRIES
+### After (S/4HANA) — Option A: Minimal brownfield fix (keep BSEG reads)
 
 ```abap
 DATA: it_bkpf TYPE TABLE OF bkpf,
-      et_bseg TYPE TABLE OF bseg.
+      it_bseg TYPE TABLE OF bseg.
 
-SELECT * FROM bkpf INTO TABLE it_bkpf
+SELECT * FROM bkpf INTO TABLE @it_bkpf
   WHERE bukrs = '1000' AND gjahr = '2023'.
 
-" Use the provided function module instead of direct SELECT from BSEG
-CALL FUNCTION 'FAGL_GET_BSEG_FOR_ALL_ENTRIES'
-  EXPORTING
-    it_for_all_entries = it_bkpf[]
-  IMPORTING
-    et_bseg            = et_bseg
-  EXCEPTIONS
-    no_data_found      = 1
-    OTHERS             = 2.
+" Guard against empty driving table
+IF it_bkpf IS NOT INITIAL.
+  SELECT bukrs belnr gjahr buzei wrbtr
+    FROM bseg
+    INTO TABLE @it_bseg
+    FOR ALL ENTRIES IN @it_bkpf
+    WHERE bukrs = @it_bkpf-bukrs
+      AND belnr = @it_bkpf-belnr
+      AND gjahr = @it_bkpf-gjahr
+    ORDER BY PRIMARY KEY.
+ENDIF.
 ```
 
-> **Why:** This FM is aware of the S/4HANA data model and reads from the correct underlying structures regardless of whether data is in ACDOCA or legacy tables.
+> **Why this works now:** BSEG is no longer a cluster table in S/4HANA. The old restriction against FOR ALL ENTRIES on cluster tables no longer applies. Adding `ORDER BY PRIMARY KEY` and the `IS NOT INITIAL` guard are the only required changes.
+
+### After (S/4HANA) — Option B: New development — read ACDOCA directly
+
+See Pattern 2 below. For new code or significant rewrites, bypass BSEG entirely and read from ACDOCA.
 
 **Source:** https://community.sap.com/t5/enterprise-resource-planning-blogs-by-members/handling-of-select-statements-on-simplified-tables-during-s-4-hana/ba-p/13535678
 
@@ -64,7 +71,9 @@ SELECT rbukrs  " Company code
        belnr   " Document number
        gjahr   " Fiscal year
        buzei   " Line item
-       hsl     " Amount in local currency (replaces DMBTR)
+       ledger  " Ledger — filter to avoid duplicates in multi-ledger systems
+       hsl     " Amount in local currency (= DMBTR equivalent)
+       wsl     " Amount in transaction/document currency (= WRBTR equivalent)
        ksl     " Amount in group currency
        prctr   " Profit center
        kostl   " Cost center
@@ -72,19 +81,23 @@ SELECT rbukrs  " Company code
   INTO TABLE @lt_acdoca
   WHERE rbukrs = '1000'
     AND gjahr  = '2023'
-    AND blart  = 'RV'   " Billing document
+    AND blart  = 'RV'    " Billing document
+    AND ledger = '0L'    " Leading ledger — omit this line only if multi-ledger reads are intentional
   ORDER BY PRIMARY KEY.
 ```
+
+> **Multi-ledger note:** ACDOCA stores postings for all active ledgers. Without `LEDGER = '0L'` the query returns rows for every ledger (leading + extension), causing duplicate amounts in totals. Always add a ledger filter unless your code explicitly handles multi-ledger data.
 
 **Key field mapping:**
 
 | ECC (BSEG) | S/4HANA (ACDOCA) | Notes |
 |---|---|---|
 | `BUKRS` | `RBUKRS` | Company code |
-| `DMBTR` | `HSL` | Amount in local currency |
-| `WRBTR` | `WSL` | Amount in document currency |
+| `DMBTR` | `HSL` | Amount in local (company code) currency |
+| `WRBTR` | `WSL` | Amount in transaction/document currency |
 | `KOSTL` | `KOSTL` | Cost center (same name) |
 | `PRCTR` | `PRCTR` | Profit center (same name) |
+| *(no equivalent)* | `LEDGER` | Ledger ID — new field, filter to `'0L'` for leading ledger |
 
 **Source:** SAP Help — ACDOCA table description: https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/c6c3ffd90792427a9fee1a19df5b0925/17a2e2539c70424de10000000a174cb4.html
 
@@ -149,8 +162,8 @@ ENDIF.
 
 | Pattern | Classification | Action |
 |---|---|---|
-| SELECT from BSEG via FOR ALL ENTRIES | Should-Fix | Replace with FAGL_GET_BSEG_FOR_ALL_ENTRIES |
-| New reads on FI line items | New code | Use ACDOCA directly |
+| SELECT FROM BSEG FOR ALL ENTRIES (existing brownfield code) | Should-Fix | Add `IS NOT INITIAL` guard + `ORDER BY PRIMARY KEY` — works as-is in S/4HANA |
+| New reads on FI line items | New code | Use ACDOCA with `LEDGER = '0L'` filter |
 | INSERT/UPDATE into BKPF/BSEG | **Must-Fix** | Replace with BAPI_ACC_DOCUMENT_POST |
 | UPDATE existing BSEG fields | **Must-Fix** | Use accounting BAPIs or FI change functions |
 

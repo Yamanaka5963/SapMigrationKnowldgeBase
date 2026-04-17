@@ -19,9 +19,11 @@ The **ATC (ABAP Test Cockpit)** identifies most issues automatically. The patter
 | **Must-Fix** | Direct INSERT/UPDATE/DELETE into simplified tables (ACDOCA, PRCD_ELEMENTS, MATDOC) | Runtime errors, data corruption |
 | **Must-Fix** | SELECT from pool/cluster tables via native SQL | Syntax errors post-conversion |
 | **Must-Fix** | Missing ORDER BY on BINARY SEARCH result sets | Non-deterministic results, wrong reads |
-| **Should-Fix** | SELECT from BSEG/MSEG/MKPF/MARD (backward-compatible views exist) | Deprecated path, performance risk |
+| **Should-Fix** | SELECT from BSEG/MSEG/MKPF/MARD (backward-compatible views exist) | Deprecated path, potential performance risk |
 | **Should-Fix** | Direct INSERT INTO KNA1/LFA1 instead of BP API | CVI sync not triggered, inconsistency |
 | **Should-Fix** | Old Open SQL syntax without host variables | Accepted by compiler but not future-proof |
+
+> **Brownfield note on Should-Fix:** Backward-compatible views (NSDM_V_MARD, V_KONV, MSEG compatibility view in S/4HANA) are **production-safe** — they return correct data. "Should-Fix" means: migrate when you touch this code in a sprint, or use the new path for new development. It does **not** mean these must be fixed before go-live. Prioritize Must-Fix items for cutover.
 
 ## Section Map
 

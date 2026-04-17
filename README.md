@@ -41,6 +41,17 @@ A reference guide for KEYSTONE SAP engineers handling client migration projects 
 | [34](part3-database/34-cvi-business-partner.md) | Customer/Vendor → Business Partner (CVI) |
 | [35](part3-database/35-hana-system-views-reference.md) | SAP HANA System Views Reference |
 
+### Part 4: ABAP Code Migration Patterns
+| # | Topic |
+|---|-------|
+| [40](part4-code-patterns/40-pattern-overview.md) | Pattern Overview & Must-Fix vs Should-Fix Guide |
+| [41](part4-code-patterns/41-financial-patterns.md) | Financial Patterns: BSEG/BKPF → ACDOCA |
+| [42](part4-code-patterns/42-pricing-patterns.md) | Pricing Patterns: KONV → PRCD\_ELEMENTS |
+| [43](part4-code-patterns/43-inventory-patterns.md) | Inventory Patterns: MSEG/MKPF/MARD → NSDM |
+| [44](part4-code-patterns/44-bp-master-data-patterns.md) | Business Partner Patterns: KNA1/LFA1 → BP API |
+| [45](part4-code-patterns/45-pool-cluster-patterns.md) | Pool/Cluster Patterns: STXH/STXL, PCL1/PCL2, VBUK/VBUP |
+| [46](part4-code-patterns/46-general-abap-patterns.md) | General ABAP: ORDER BY, Open SQL, Host Variables |
+
 ---
 
 > **Key deadline:** SAP ECC mainstream maintenance ends **December 31, 2027**.

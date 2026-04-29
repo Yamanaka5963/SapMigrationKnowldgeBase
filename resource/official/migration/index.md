@@ -8,12 +8,12 @@ Source: [SAP Help Portal — S/4HANA On-Premise 2023](https://help.sap.com/docs/
 
 ## Document List
 
-| Document ID | Title | Version | Released | PDF |
-|---|---|---|---|---|
-| SIMPL_OP2023 | Simplification List for SAP S/4HANA | 1.35 | 2025-02-25 | [PDF](https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf) |
-| UPGR_OP2023 | Upgrade Guide | 6.0 | 2026-01-28 | [PDF](https://help.sap.com/doc/760ce610a2af4174a329d2d8315378e2/2023/en-US/UPGR_OP2023.pdf) |
-| CONV_OP2023 | Conversion Guide | 6.0 | 2026-01-28 | [PDF](https://help.sap.com/doc/2b87656c4eee4284a5eb8976c0fe88fc/2023/en-US/CONV_OP2023.pdf) |
-| INST_OP2023 | Installation Guide | 6.0 | 2026-01-28 | [PDF](https://help.sap.com/doc/6b11678926d3409bbfea8897cb34d10f/2023/en-US/INST_OP2023.pdf) |
+| Document ID | Title | Version | Released | Size | PDF |
+|---|---|---|---|---|---|
+| SIMPL_OP2023 | Simplification List for SAP S/4HANA | 1.35 | 2025-02-25 | 9.7 MB | [PDF](https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf) |
+| UPGR_OP2023 | Upgrade Guide | 6.0 | 2026-01-28 | 655 KB | [PDF](https://help.sap.com/doc/760ce610a2af4174a329d2d8315378e2/2023/en-US/UPGR_OP2023.pdf) |
+| CONV_OP2023 | Conversion Guide | 6.0 | 2026-01-28 | 662 KB | [PDF](https://help.sap.com/doc/2b87656c4eee4284a5eb8976c0fe88fc/2023/en-US/CONV_OP2023.pdf) |
+| INST_OP2023 | Installation Guide | 6.0 | 2026-01-28 | 1.8 MB | [PDF](https://help.sap.com/doc/6b11678926d3409bbfea8897cb34d10f/2023/en-US/INST_OP2023.pdf) |
 
 ---
 
